@@ -1,3 +1,5 @@
+<img src="assets/karui.png" width="96" alt="karui icon">
+
 # karui
 
 Stupidly lightweight image viewer.
@@ -176,6 +178,8 @@ This also requires the ARM64 C++ build tools for Visual Studio Build Tools
 Without them, linking fails. `tools\install-arm64-tools.ps1` adds them; it asks for administrator approval (UAC), so run it from a desktop session.
 
 The x64 build also runs on Windows 11 on ARM through emulation, but the ARM64 build starts faster.
+
+To redraw the icon, run `python tools/make-icon.py` (requires Pillow).
 
 ## License
 

@@ -1,0 +1,2 @@
+// exe とウィンドウのアイコン（tools/make-icon.py で作る）
+1 ICON "karui.ico"

@@ -121,6 +121,9 @@ pub fn run() {
             lpfnWndProc: Some(wndproc),
             hInstance: instance,
             hCursor: LoadCursorW(None, IDC_ARROW).unwrap_or_default(),
+            // build.rs で埋め込んだアイコン（リソース番号 1）。タスクバー用と、タイトルバー用の小さいもの
+            hIcon: app_icon(instance, SM_CXICON, SM_CYICON),
+            hIconSm: app_icon(instance, SM_CXSMICON, SM_CYSMICON),
             // 描画の準備ができるまで白く光らないように黒で塗る
             hbrBackground: HBRUSH(GetStockObject(BLACK_BRUSH).0),
             lpszClassName: class,
@@ -1038,6 +1041,15 @@ fn find_ready<'a>(cache: &'a [(PathBuf, Slot)], path: &Path) -> Option<&'a Bitma
         Slot::Ready(b) if p == path => Some(b),
         _ => None,
     })
+}
+
+/// ico の中からその大きさに合うものを選んで読む
+fn app_icon(instance: HINSTANCE, cx: SYSTEM_METRICS_INDEX, cy: SYSTEM_METRICS_INDEX) -> HICON {
+    unsafe {
+        LoadImageW(Some(instance), PCWSTR(1 as _), IMAGE_ICON, GetSystemMetrics(cx), GetSystemMetrics(cy), LR_SHARED)
+            .map(|h| HICON(h.0))
+            .unwrap_or_default()
+    }
 }
 
 /// タイトルバーを Windows の「アプリモード」（ライト / ダーク）に合わせる
