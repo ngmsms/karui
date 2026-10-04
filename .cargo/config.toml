@@ -1,0 +1,3 @@
+# C ランタイムを exe に取り込む。VCRUNTIME140.dll が入っていない PC（特に Windows on ARM）でも、exe 1 つで動くようにする
+[target.'cfg(all(windows, target_env = "msvc"))']
+rustflags = ["-C", "target-feature=+crt-static"]

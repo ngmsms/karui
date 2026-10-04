@@ -1,0 +1,15 @@
+# ビルド成果物（ARM64 版の target\aarch64-pc-windows-msvc、snapshot 用の target\snap もここ）
+/target/
+
+# rustfmt のバックアップ
+**/*.rs.bk
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+
+# OS が作るファイル
+Thumbs.db
+desktop.ini
+.DS_Store
