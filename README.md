@@ -30,6 +30,14 @@ Built with Claude Code.
   - Left button + wheel to cycle display sizes, right-to-left page order, right-drag up for fullscreen
   - See [Relationship to NeeView](#relationship-to-neeview)
 
+## Download
+
+Download `karui-x64.exe` (or `karui-arm64.exe` for Windows on ARM) from [Releases](https://github.com/ngmsms/karui/releases) and run it. No installation is needed.
+`SHA256SUMS.txt` lists the checksums of the executables.
+
+The executables are not code-signed, so Windows SmartScreen may show "Windows protected your PC" the first time.
+Click **More info** → **Run anyway**.
+
 ## Usage
 
 Open an image or folder:
@@ -178,6 +186,17 @@ This also requires the ARM64 C++ build tools for Visual Studio Build Tools
 Without them, linking fails. `tools\install-arm64-tools.ps1` adds them; it asks for administrator approval (UAC), so run it from a desktop session.
 
 The x64 build also runs on Windows 11 on ARM through emulation, but the ARM64 build starts faster.
+
+### Releases
+
+Pushing a tag that starts with `v` runs `.github/workflows/release.yml` on GitHub Actions:
+it runs the tests, builds the x64 and ARM64 executables, and attaches them to a new release.
+The tag must match `version` in `Cargo.toml`.
+
+```
+git tag v0.1.1
+git push origin v0.1.1
+```
 
 To redraw the icon, run `python tools/make-icon.py` (requires Pillow).
 

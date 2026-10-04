@@ -1,0 +1,54 @@
+# v で始まるタグ（例: v0.1.0）を push すると、x64 版と ARM64 版をビルドして Release に添付する。
+#
+#   git tag v0.1.1
+#   git push origin v0.1.1
+#
+# タグは Cargo.toml の version と合わせること（違うと止まる）。
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2025
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check tag matches Cargo.toml version
+        run: |
+          $version = (Select-String -Path Cargo.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
+          if ("v$version" -ne $env:GITHUB_REF_NAME) {
+            throw "tag $env:GITHUB_REF_NAME does not match Cargo.toml version $version"
+          }
+
+      - name: Test
+        run: cargo test --release
+
+      - name: Build x64 and ARM64
+        run: |
+          rustup target add aarch64-pc-windows-msvc
+          cargo build --release --target x86_64-pc-windows-msvc
+          cargo build --release --target aarch64-pc-windows-msvc
+          New-Item -ItemType Directory dist | Out-Null
+          Copy-Item target/x86_64-pc-windows-msvc/release/karui.exe dist/karui-x64.exe
+          Copy-Item target/aarch64-pc-windows-msvc/release/karui.exe dist/karui-arm64.exe
+          Get-ChildItem dist/*.exe | ForEach-Object {
+            "{0}  {1}" -f (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower(), $_.Name
+          } | Set-Content dist/SHA256SUMS.txt
+          Get-Content dist/SHA256SUMS.txt
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create $env:GITHUB_REF_NAME dist/karui-x64.exe dist/karui-arm64.exe dist/SHA256SUMS.txt `
+            --repo $env:GITHUB_REPOSITORY --title "karui $env:GITHUB_REF_NAME" --generate-notes
